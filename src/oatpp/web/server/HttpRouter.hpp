@@ -132,15 +132,17 @@ public:
   static std::shared_ptr<HttpRouter> createShared();
 
   using HttpRouterTemplate::route;
-  void route(const std::shared_ptr<server::api::Endpoint>& endpoint);
-  void route(const server::api::Endpoints& endpoints);
+  void route(const std::shared_ptr<server::api::Endpoint>& endpoint, const String& basePath = String());
+  void route(const server::api::Endpoints& endpoints, const String& basePath = String());
 
   /**
    * Add controller and route its' endpoints.
    * @param controller
    * @return - `std::shared_ptr` to the controller added.
    */
-  std::shared_ptr<server::api::ApiController> addController(const std::shared_ptr<server::api::ApiController>& controller);
+  std::shared_ptr<server::api::ApiController> addController(
+      const std::shared_ptr<server::api::ApiController>& controller,
+      const String& basePath = String());
 
 };
   

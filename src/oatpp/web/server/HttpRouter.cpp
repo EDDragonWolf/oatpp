@@ -30,19 +30,27 @@ std::shared_ptr<HttpRouter> HttpRouter::createShared() {
   return std::make_shared<HttpRouter>();
 }
 
-void HttpRouter::route(const std::shared_ptr<server::api::Endpoint>& endpoint) {
-  route(endpoint->info()->method, endpoint->info()->path, endpoint->handler);
+void HttpRouter::route(const std::shared_ptr<server::api::Endpoint>& endpoint, const String& basePath) {
+  const String base = basePath ? basePath : "";
+  String path = endpoint->info()->path;
+  if((base->size() > 0 && base->data()[base->size() - 1] == '/') || path->data()[0] == '/') {
+    path = base + path;
+  } else {
+    path = base + "/" + path;
+  }
+  route(endpoint->info()->method, path, endpoint->handler);
 }
 
-void HttpRouter::route(const server::api::Endpoints& endpoints) {
+void HttpRouter::route(const server::api::Endpoints& endpoints, const String& basePath) {
   for(auto& e : endpoints.list) {
-    route(e);
+    route(e, basePath);
   }
 }
 
-std::shared_ptr<server::api::ApiController> HttpRouter::addController(const std::shared_ptr<server::api::ApiController>& controller) {
+std::shared_ptr<server::api::ApiController> HttpRouter::addController(
+    const std::shared_ptr<server::api::ApiController>& controller, const String& basePath) {
   m_controllers.push_back(controller);
-  route(controller->getEndpoints());
+  route(controller->getEndpoints(), basePath);
   return controller;
 }
 
